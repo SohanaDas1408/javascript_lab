@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Class Scheduler & Live Countdown</title>
+    <!-- Google Fonts for crisp modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Top Navigation / Header -->
+        <header class="app-header">
+            <div class="header-container">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="brand-title">CampusPulse</h1>
+                        <p class="brand-subtitle">Dynamic Class Scheduler & Real-Time Countdown</p>
+                    </div>
+                </div>
+
+                <!-- Live Digital Clock Widget (powered by setInterval) -->
+                <div class="clock-widget" title="Live System Clock (setInterval)">
+                    <div class="clock-time" id="liveClockTime">00:00:00 <span class="ampm">AM</span></div>
+                    <div class="clock-sub">
+                        <span id="liveClockDay" class="clock-day">Loading...</span>
+                        <span class="clock-sep">•</span>
+                        <span id="liveClockDate" class="clock-date">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Time Machine / Testing Helper & Action Buttons -->
+                <div class="header-actions">
+                    <div class="simulation-box">
+                        <label for="simulationSelect" class="sim-label">⚡ Test Simulation:</label>
+                        <select id="simulationSelect" class="sim-select" title="Simulate different days/times to observe live countdown and active class transitions">
+                            <option value="real">Real Local Time</option>
+                            <option value="1:09:15">Mon 09:15 AM (Live: Algorithms)</option>
+                            <option value="1:10:45">Mon 10:45 AM (15m to Web Tech)</option>
+                            <option value="2:10:05">Tue 10:05 AM (Live: DBMS)</option>
+                            <option value="3:12:55">Wed 12:55 PM (5m to OS)</option>
+                            <option value="5:13:50">Fri 01:50 PM (10m to SE Lab)</option>
+                        </select>
+                    </div>
+
+                    <button id="btnOpenAddModal" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Add Class</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulation Banner (Visible when time is shifted) -->
+            <div id="simIndicator" class="simulation-active-bar hidden">
+                <span>Simulating target time</span>
+                <button id="btnResetTime" class="btn-link">Return to Real Time</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Hero Live Countdown / Active Session Banner -->
+            <section class="hero-section">
+                <div id="heroBannerCard" class="hero-card">
+                    <div class="hero-header">
+                        <div class="hero-status-wrapper">
+                            <span id="heroStatusTag" class="status-tag status-idle">Checking Schedule...</span>
+                        </div>
+                        <div class="hero-actions-top">
+                            <button id="btnResetScheduleData" class="btn-text-subtle" title="Reset schedule to sample classes">
+                                ↺ Reset Sample Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hero-body">
+                        <div class="hero-info">
+                            <h2 id="heroTitle" class="hero-course-title">Loading Class Status...</h2>
+                            <p id="heroMeta" class="hero-course-meta">Calculating live time offsets</p>
+                        </div>
+
+                        <!-- Real-Time Countdown Flip Cards -->
+                        <div class="countdown-grid">
+                            <div class="countdown-unit">
+                                <div class="unit-val" id="heroCdDays">00</div>
+                                <div class="unit-lbl">DAYS</div>
+                            </div>
+                            <div class="countdown-sep">:</div>
+                            <div class="countdown-unit">
+                                <div class="unit-val" id="heroCdHours">00</div>
+                                <div class="unit-lbl">HOURS</div>
+                            </div>
+                            <div class="countdown-sep">:</div>
+                            <div class="countdown-unit">
+                                <div class="unit-val" id="heroCdMins">00</div>
+                                <div class="unit-lbl">MINUTES</div>
+                            </div>
+                            <div class="countdown-sep">:</div>
+                            <div class="countdown-unit">
+                                <div class="unit-val" id="heroCdSecs">00</div>
+                                <div class="unit-lbl">SECONDS</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar for Active Session or Upcoming Countdown -->
+                    <div class="hero-progress-container">
+                        <div class="hero-progress-meta">
+                            <span id="heroProgressLabel" class="hero-progress-label">Calculating...</span>
+                        </div>
+                        <div class="hero-progress-track">
+                            <div id="heroProgressBar" class="hero-progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Grid: Timetable + Focus Countdown Utilities -->
+            <div class="dashboard-grid">
+                <!-- Left/Main Column: Class Scheduler & Timetable -->
+                <section class="schedule-section">
+                    <div class="section-header">
+                        <div class="section-title-group">
+                            <h2 class="section-title">Weekly Class Schedule</h2>
+                            <span id="scheduleCountBadge" class="count-badge">0 classes</span>
+                        </div>
+
+                        <!-- Day of Week Filter Buttons -->
+                        <div class="day-filters" id="dayFilters">
+                            <button class="filter-btn active" data-filter="all">All Days</button>
+                            <button class="filter-btn" data-filter="today">Today</button>
+                            <button class="filter-btn" data-filter="1">Mon</button>
+                            <button class="filter-btn" data-filter="2">Tue</button>
+                            <button class="filter-btn" data-filter="3">Wed</button>
+                            <button class="filter-btn" data-filter="4">Thu</button>
+                            <button class="filter-btn" data-filter="5">Fri</button>
+                            <button class="filter-btn" data-filter="6">Sat</button>
+                            <button class="filter-btn" data-filter="0">Sun</button>
+                        </div>
+                    </div>
+
+                    <!-- Cards Container -->
+                    <div id="scheduleList" class="schedule-card-list">
+                        <!-- Populated dynamically by ui.js -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="scheduleEmptyState" class="empty-state hidden">
+                        <div class="empty-icon">📅</div>
+                        <h3>No classes found for this filter</h3>
+                        <p>No lectures are scheduled for this day. You can add one or switch to "All Days".</p>
+                    </div>
+                </section>
+
+                <!-- Right Column: Focus/Study Timer & Technical Highlights -->
+                <aside class="sidebar-section">
+                    <!-- Study / Focus / Exam Countdown Timer -->
+                    <div class="sidebar-card" id="customTimerCard">
+                        <div class="sidebar-card-header">
+                            <div class="sidebar-icon">⏳</div>
+                            <div>
+                                <h3 class="sidebar-title">Focus & Study Timer</h3>
+                                <p class="sidebar-sub">Custom countdown with audio chime</p>
+                            </div>
+                        </div>
+
+                        <div class="timer-dial-container">
+                            <div class="timer-svg-wrap">
+                                <svg class="timer-ring-svg" viewBox="0 0 100 100">
+                                    <circle class="ring-bg" cx="50" cy="50" r="45"></circle>
+                                    <circle class="ring-fg" id="timerProgressRing" cx="50" cy="50" r="45"></circle>
+                                </svg>
+                                <div class="timer-display-digits">
+                                    <span id="timerMinutes">25</span>:<span id="timerSeconds">00</span>
+                                </div>
+                            </div>
+                            <div id="timerStatusText" class="timer-status-hint">Ready to Start</div>
+                        </div>
+
+                        <!-- Presets -->
+                        <div class="timer-preset-row">
+                            <button class="timer-preset-btn" data-mins="15">15m</button>
+                            <button class="timer-preset-btn active" data-mins="25">25m</button>
+                            <button class="timer-preset-btn" data-mins="45">45m</button>
+                            <button class="timer-preset-btn" data-mins="60">60m</button>
+                        </div>
+
+                        <!-- Custom minutes input -->
+                        <div class="custom-mins-row">
+                            <label for="timerCustomMinutes">Custom minutes:</label>
+                            <input type="number" id="timerCustomMinutes" min="1" max="180" placeholder="e.g. 30">
+                        </div>
+
+                        <!-- Timer Controls -->
+                        <div class="timer-controls">
+                            <button id="btnTimerStart" class="btn btn-primary btn-block">Start Session</button>
+                            <button id="btnTimerPause" class="btn btn-warning btn-block hidden">Pause</button>
+                            <button id="btnTimerReset" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specs Card (Explaining Lab 11 Concept Implementation) -->
+                    <div class="sidebar-card tech-card">
+                        <div class="sidebar-card-header">
+                            <div class="sidebar-icon">⚡</div>
+                            <div>
+                                <h3 class="sidebar-title">Architecture Highlights</h3>
+                                <p class="sidebar-sub">ES6 Modules & Timers in Action</p>
+                            </div>
+                        </div>
+
+                        <ul class="tech-feature-list">
+                            <li>
+                                <strong>ES6 Modules:</strong> Code split into <code>timer.js</code>, <code>scheduler.js</code>, <code>ui.js</code>, <code>notifications.js</code>, and <code>storage.js</code> with strict <code>import</code>/<code>export</code>.
+                            </li>
+                            <li>
+                                <strong>setInterval():</strong> 1,000ms loop updates the live clock, checks active course progress %, and powers the countdown flip units.
+                            </li>
+                            <li>
+                                <strong>setTimeout():</strong> Handles 5-minute pre-class warning alerts, modal animations, and auto-dismissing toast notifications.
+                            </li>
+                            <li>
+                                <strong>clearInterval() & clearTimeout():</strong> Clean disposal prevents timer drift and memory leaks during pause, reset, and modal events.
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </main>
+
+        <!-- Add Class Modal Dialog -->
+        <div id="addClassModal" class="modal-overlay">
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <h3>Add New Scheduled Class</h3>
+                    <button id="btnCloseAddModal" class="modal-close" aria-label="Close dialog">&times;</button>
+                </div>
+                <form id="addClassForm" class="modal-form">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="classTitle">Course Title *</label>
+                            <input type="text" id="classTitle" placeholder="e.g., Computer Graphics & Animation" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classCode">Course Code *</label>
+                            <input type="text" id="classCode" placeholder="e.g., CS-402" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classDay">Day of Week *</label>
+                            <select id="classDay" required>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="0">Sunday</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classStartTime">Start Time *</label>
+                            <input type="time" id="classStartTime" required value="09:00">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classEndTime">End Time *</label>
+                            <input type="time" id="classEndTime" required value="10:30">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classRoom">Room / Location</label>
+                            <input type="text" id="classRoom" placeholder="e.g., Lab 3 or Zoom Link">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classInstructor">Instructor Name</label>
+                            <input type="text" id="classInstructor" placeholder="e.g., Prof. Hawkins">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Card Color Accent</label>
+                            <div class="color-picker-row">
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#6366f1" checked>
+                                    <span class="swatch-circle" style="background: #6366f1;"></span>
+                                </label>
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#06b6d4">
+                                    <span class="swatch-circle" style="background: #06b6d4;"></span>
+                                </label>
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#10b981">
+                                    <span class="swatch-circle" style="background: #10b981;"></span>
+                                </label>
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#f59e0b">
+                                    <span class="swatch-circle" style="background: #f59e0b;"></span>
+                                </label>
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#ec4899">
+                                    <span class="swatch-circle" style="background: #ec4899;"></span>
+                                </label>
+                                <label class="color-swatch">
+                                    <input type="radio" name="classColor" value="#8b5cf6">
+                                    <span class="swatch-circle" style="background: #8b5cf6;"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" id="btnCancelAddModal" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Class</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notifications Container (managed with setTimeout & clearTimeout) -->
+        <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+    </div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>

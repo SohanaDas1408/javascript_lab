@@ -1,0 +1,207 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Web Storage Theme Manager</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+
+        margin: 0;
+
+        min-height: 100vh;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      .light-theme {
+        background-color: #eef2f7;
+
+        color: #222;
+      }
+
+      .dark-theme {
+        background-color: #1e1e1e;
+
+        color: #ffffff;
+      }
+
+      .container {
+        width: 550px;
+
+        padding: 30px;
+
+        border-radius: 12px;
+
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
+        background-color: white;
+      }
+
+      .dark-theme .container {
+        background-color: #2b2b2b;
+      }
+
+      h2 {
+        text-align: center;
+
+        margin-bottom: 25px;
+      }
+
+      .student-info {
+        padding: 12px;
+
+        margin-bottom: 25px;
+
+        border-radius: 6px;
+
+        background-color: #f2f2f2;
+      }
+
+      .dark-theme .student-info {
+        background-color: #3a3a3a;
+      }
+
+      label {
+        display: block;
+
+        font-weight: bold;
+
+        margin-bottom: 8px;
+      }
+
+      select {
+        width: 100%;
+
+        padding: 11px;
+
+        font-size: 16px;
+
+        border-radius: 6px;
+
+        border: 1px solid #ccc;
+
+        margin-bottom: 15px;
+      }
+
+      button {
+        width: 100%;
+
+        padding: 12px;
+
+        margin-top: 10px;
+
+        border: none;
+
+        border-radius: 6px;
+
+        font-size: 16px;
+
+        cursor: pointer;
+      }
+
+      #saveTheme {
+        background-color: #007bff;
+
+        color: white;
+      }
+
+      #saveTheme:hover {
+        background-color: #0056b3;
+      }
+
+      #clearTheme {
+        background-color: #dc3545;
+
+        color: white;
+      }
+
+      #clearTheme:hover {
+        background-color: #b02a37;
+      }
+
+      #status {
+        margin-top: 20px;
+
+        padding: 12px;
+
+        background-color: #e9f7ef;
+
+        color: #155724;
+
+        border-radius: 6px;
+      }
+
+      .dark-theme #status {
+        background-color: #314d3a;
+
+        color: #d4edda;
+      }
+
+      #sessionInfo {
+        margin-top: 15px;
+
+        padding: 12px;
+
+        border-radius: 6px;
+
+        background-color: #f5f5f5;
+      }
+
+      .dark-theme #sessionInfo {
+        background-color: #3a3a3a;
+      }
+    </style>
+
+    <script src="storage.js" defer></script>
+  </head>
+
+  <body class="light-theme">
+    <div class="container">
+      <h2>Theme Preference Manager</h2>
+
+      <div class="student-info">
+        <strong>Student:</strong>
+        Pramit Kumar Ghosh
+
+        <br />
+
+        <strong>PRN:</strong>
+        24070521109
+      </div>
+
+      <label for="theme"> Select Theme </label>
+
+      <select id="theme">
+        <option value="light">Light Theme</option>
+
+        <option value="dark">Dark Theme</option>
+      </select>
+
+      <button id="saveTheme">Save Theme Preference</button>
+
+      <button id="clearTheme">Clear Saved Preference</button>
+
+      <div id="status">Theme preference status will appear here.</div>
+
+      <div id="sessionInfo">Session information will appear here.</div>
+    </div>
+  </body>
+</html>

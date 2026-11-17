@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Info App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Weather Insights</h1>
+            <p>Select a location to get the latest weather forecast.</p>
+        </header>
+
+        <div class="controls-container">
+            <div class="select-group">
+                <label for="state-select">State</label>
+                <select id="state-select">
+                    <option value="" disabled selected>Choose a state...</option>
+                </select>
+            </div>
+            
+            <div class="select-group">
+                <label for="city-select">City</label>
+                <select id="city-select" disabled>
+                    <option value="" disabled selected>Choose a city...</option>
+                </select>
+            </div>
+            
+            <button id="get-weather-btn" disabled>Get Weather</button>
+        </div>
+
+        <div id="weather-display" class="weather-display hidden">
+            <div class="loader hidden" id="loader"></div>
+            <div id="weather-content"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

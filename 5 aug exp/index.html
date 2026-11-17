@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure mobile number verification with OTP - Fast and reliable phone verification system">
+    <title>Mobile Number Verification | Secure OTP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <div class="container">
+        <!-- Step 1: Phone Number Entry -->
+        <div class="card" id="phoneCard">
+            <div class="card-glow"></div>
+            <div class="icon-wrapper">
+                <div class="icon-ring"></div>
+                <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+            </div>
+
+            <h1 id="mainTitle">Verify Your Number</h1>
+            <p class="subtitle" id="mainSubtitle">Enter your mobile number to receive a one-time verification code via SMS.</p>
+
+            <div class="input-group" id="phoneInputGroup">
+                <label for="countryCode">Country Code</label>
+                <div class="phone-row">
+                    <select id="countryCode" class="country-select">
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+81">🇯🇵 +81</option>
+                        <option value="+49">🇩🇪 +49</option>
+                        <option value="+33">🇫🇷 +33</option>
+                        <option value="+86">🇨🇳 +86</option>
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+65">🇸🇬 +65</option>
+                    </select>
+                    <div class="phone-input-wrapper">
+                        <input type="tel" id="phoneNumber" placeholder="Enter mobile number" maxlength="10" autocomplete="tel">
+                        <div class="input-border"></div>
+                    </div>
+                </div>
+                <span class="error-msg" id="phoneError"></span>
+            </div>
+
+            <button class="btn-primary" id="sendOtpBtn">
+                <span class="btn-text">Send Verification Code</span>
+                <span class="btn-loader" id="sendLoader">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <p class="terms">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div class="card hidden" id="otpCard">
+            <div class="card-glow"></div>
+            <button class="back-btn" id="backBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back
+            </button>
+
+            <div class="icon-wrapper">
+                <div class="icon-ring"></div>
+                <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10" class="check-mark"/>
+                </svg>
+            </div>
+
+            <h1>Enter OTP Code</h1>
+            <p class="subtitle">A 6-digit code has been sent to <strong id="displayNumber"></strong></p>
+
+            <div class="otp-container" id="otpContainer">
+                <input type="text" class="otp-input" maxlength="1" data-index="0" inputmode="numeric" autocomplete="one-time-code">
+                <input type="text" class="otp-input" maxlength="1" data-index="1" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric">
+                <div class="otp-divider"></div>
+                <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric">
+                <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric">
+            </div>
+            <span class="error-msg" id="otpError"></span>
+
+            <button class="btn-primary" id="verifyOtpBtn">
+                <span class="btn-text">Verify Code</span>
+                <span class="btn-loader" id="verifyLoader">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <div class="resend-row">
+                <span id="timerText">Resend code in <strong id="countdown">30</strong>s</span>
+                <button class="resend-btn hidden" id="resendBtn">Resend Code</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div class="card hidden" id="successCard">
+            <div class="card-glow success-glow"></div>
+            <div class="success-animation">
+                <div class="success-ring"></div>
+                <svg class="success-check" viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="23" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/>
+                </svg>
+            </div>
+            <h1 class="success-title">Verified!</h1>
+            <p class="subtitle">Your mobile number <strong id="verifiedNumber"></strong> has been successfully verified.</p>
+
+            <div class="success-details">
+                <div class="detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span>Identity confirmed</span>
+                </div>
+                <div class="detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span>Secure encryption</span>
+                </div>
+                <div class="detail-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Completed just now</span>
+                </div>
+            </div>
+
+            <button class="btn-primary btn-success" id="doneBtn">
+                <span class="btn-text">Continue</span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

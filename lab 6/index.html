@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Regex Text Analyzer</title>
+
+<style>
+
+body{
+
+font-family:Arial,Helvetica,sans-serif;
+background:#eef2f7;
+display:flex;
+justify-content:center;
+padding:40px;
+
+}
+
+.container{
+
+width:700px;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.2);
+
+}
+
+input,textarea{
+
+width:100%;
+padding:10px;
+margin:10px 0;
+font-size:16px;
+
+}
+
+textarea{
+
+height:160px;
+resize:vertical;
+
+}
+
+button{
+
+width:100%;
+padding:12px;
+margin-top:10px;
+font-size:16px;
+background:#007bff;
+color:white;
+border:none;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#0056b3;
+
+}
+
+.section{
+
+margin-top:30px;
+
+}
+
+#analysis{
+
+margin-top:20px;
+background:#f8f9fa;
+padding:15px;
+border-radius:8px;
+
+}
+
+</style>
+
+<script src="regex.js" defer></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>String Functions and Regex</h2>
+
+<p>
+
+<strong>Student:</strong>
+Pramit Kumar Ghosh
+
+<br>
+
+<strong>PRN:</strong>
+24070521109
+
+</p>
+
+<div class="section">
+
+<h3>Email Validation</h3>
+
+<input
+type="text"
+id="email"
+placeholder="Enter Email Address">
+
+<button onclick="validateEmail()">
+
+Validate Email
+
+</button>
+
+<p id="emailResult"></p>
+
+</div>
+
+<div class="section">
+
+<h3>Text Analysis</h3>
+
+<textarea
+id="text"
+placeholder="Enter text containing words, numbers, and email addresses..."></textarea>
+
+<button onclick="analyzeText()">
+
+Analyze Text
+
+</button>
+
+<div id="analysis">
+
+Analysis result will appear here.
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

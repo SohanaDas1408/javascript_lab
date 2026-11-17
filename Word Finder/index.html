@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Finder — Anagram Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Word Finder</h1>
+            <p>Enter a word to see all letter rearrangements and discover meaningful words hidden within.</p>
+        </header>
+
+        <main>
+            <!-- Dictionary Loading Status -->
+            <div id="dict-status" class="dict-status loading">
+                <span class="spinner"></span>
+                <span>Loading dictionary…</span>
+            </div>
+
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="word-input"
+                        placeholder="Enter a word (e.g. hello)"
+                        maxlength="10"
+                        autocomplete="off"
+                        spellcheck="false"
+                        disabled
+                    >
+                    <button id="btn-find" class="btn primary" disabled>Find Words</button>
+                    <button id="btn-clear" class="btn secondary" disabled>Clear</button>
+                </div>
+                <small class="hint">Maximum 10 letters. Only alphabetic characters allowed.</small>
+            </div>
+
+            <!-- Stats Bar -->
+            <div id="stats-bar" class="stats-bar hidden">
+                <div class="stat">
+                    <span class="stat-value" id="stat-total">0</span>
+                    <span class="stat-label">Total Permutations</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-meaningful">0</span>
+                    <span class="stat-label">Meaningful Words</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="stat-time">0ms</span>
+                    <span class="stat-label">Time Taken</span>
+                </div>
+            </div>
+
+            <!-- Letter Frequency Section -->
+            <div id="frequency-section" class="frequency-section hidden">
+                <h2>Letter Frequency</h2>
+                <div id="frequency-chart" class="frequency-chart"></div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progress-container" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-text" class="progress-text">Generating permutations…</span>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="results hidden">
+                <!-- Meaningful words section -->
+                <div id="meaningful-section"></div>
+
+                <!-- All permutations section -->
+                <div id="all-permutations-section"></div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">*</div>
+                <p>Enter a word above to get started!</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Dictionary powered by open-source English word list.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

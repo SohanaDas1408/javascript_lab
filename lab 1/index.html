@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JavaScript Integration Framework Experiment</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .experimental-card {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            max-width: 480px;
+            width: 100%;
+            border-top: 5px solid #2c3e50;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .header-meta {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-bottom: 25px;
+            border-bottom: 2px dashed #bdc3c7;
+            padding-bottom: 10px;
+        }
+
+        .info-node {
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f2f4f8;
+        }
+
+        .node-tag {
+            font-weight: bold;
+            color: #34495e;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .node-value {
+            color: #2980b9;
+            font-size: 16px;
+            margin-top: 4px;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .interactive-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+            transition: 0.2s;
+        }
+
+        .interactive-btn:hover {
+            background-color: #219653;
+            transform: translateY(-1px);
+        }
+    </style>
+
+    <!-- External JavaScript File -->
+    <script src="script.js" defer></script>
+
+</head>
+
+<body>
+
+    <div class="experimental-card">
+
+        <!-- Welcome Heading -->
+        <h1 id="welcome-heading">
+            Fetching Welcome Engine Core...
+        </h1>
+
+        <!-- Student Details -->
+        <div class="header-meta">
+            <strong>Student:</strong> Pramit Kumar Ghosh |
+            <strong>PRN:</strong> 24070521109
+            <br>
+            <strong>Path:</strong>
+            C:/Users/Pramit_Ghosh/Documents/Web_Lab/Exp1/index.html
+        </div>
+
+        <!-- User Information -->
+        <div class="profile-layout-container">
+
+            <div class="info-node">
+                <div class="node-tag">Dashboard Handle</div>
+                <div id="info-username" class="node-value">
+                    Synchronizing System Data...
+                </div>
+            </div>
+
+            <div class="info-node">
+                <div class="node-tag">Official Email</div>
+                <div id="info-email" class="node-value">
+                    Synchronizing System Data...
+                </div>
+            </div>
+
+            <div class="info-node">
+                <div class="node-tag">User Role</div>
+                <div id="info-role" class="node-value">
+                    Synchronizing System Data...
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Inline JavaScript -->
+        <button
+            class="interactive-btn"
+            onclick="
+                console.log('Inline JS: Button clicked successfully.');
+                alert('Inline JavaScript Executed Successfully!\n\nStudent: Pramit Kumar Ghosh\nPRN: 24070521109');
+            ">
+            Fire Inline Event
+        </button>
+
+    </div>
+
+    <!-- Internal JavaScript -->
+    <script>
+
+        console.log("Internal JS: Embedded script loaded successfully.");
+
+        console.log(
+            "Internal JS Path Reference: C:/Users/Pramit_Ghosh/Documents/Web_Lab/Exp1/index.html"
+        );
+
+        // Render dashboard after HTML is loaded
+        window.addEventListener("DOMContentLoaded", function () {
+            renderUserDashboard();
+        });
+
+    </script>
+
+</body>
+</html>

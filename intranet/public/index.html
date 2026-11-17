@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IntraChat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="connection-status" id="connection-status">Connecting...</div>
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>🖧 IntraChat</h2>
+        <span class="local-info" id="local-info">Your IP: loading...</span>
+      </div>
+      <div class="add-peer">
+        <input type="text" id="peer-ip-input" placeholder="Enter IP address...">
+        <button id="add-peer-btn">+ Add</button>
+      </div>
+      <div class="peer-list" id="peer-list">
+        <!-- Peer items will be dynamically added -->
+      </div>
+    </div>
+    <div class="chat-area">
+      <div class="chat-header" id="chat-header">
+        <span>Select a peer to start chatting</span>
+      </div>
+      <div class="messages empty-state" id="messages">
+        <div class="icon">💬</div>
+        <div>Select a peer from the left to start chatting</div>
+      </div>
+      <div class="message-input" id="message-input-area" style="display:none">
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button id="send-btn">Send ▶</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

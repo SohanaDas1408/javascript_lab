@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Pramit Kumar Ghosh",
+    "course": "Computer Engineering",
+    "semester": 6,
+    "marks": 88
+  },
+  {
+    "id": 2,
+    "name": "Rahul Sharma",
+    "course": "Computer Engineering",
+    "semester": 6,
+    "marks": 82
+  },
+  {
+    "id": 3,
+    "name": "Sneha Patil",
+    "course": "Information Technology",
+    "semester": 6,
+    "marks": 91
+  },
+  {
+    "id": 4,
+    "name": "Arjun Mehta",
+    "course": "Computer Engineering",
+    "semester": 6,
+    "marks": 76
+  },
+  {
+    "id": 5,
+    "name": "Ananya Singh",
+    "course": "Information Technology",
+    "semester": 6,
+    "marks": 85
+  }
+]

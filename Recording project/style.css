@@ -1,0 +1,190 @@
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #333;
+    --container-bg: #fff;
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --success-color: #198754;
+    --success-hover: #157347;
+    --danger-color: #dc3545;
+    --danger-hover: #bb2d3b;
+    --border-color: #dee2e6;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--container-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: #6c757d;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#live-video {
+    width: 100%;
+    display: block;
+    transform: scaleX(-1); /* Mirror effect for webcam */
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    color: white;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn.primary { background-color: var(--primary-color); }
+.btn.primary:not(:disabled):hover { background-color: var(--primary-hover); }
+
+.btn.success { background-color: var(--success-color); }
+.btn.success:not(:disabled):hover { background-color: var(--success-hover); }
+
+.btn.danger { background-color: var(--danger-color); }
+.btn.danger:not(:disabled):hover { background-color: var(--danger-hover); }
+
+.status-indicator {
+    text-align: center;
+    margin-bottom: 2rem;
+    height: 1.5rem;
+}
+
+.hidden {
+    display: none;
+}
+
+#recording-status {
+    color: var(--danger-color);
+    font-weight: bold;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 2rem 0;
+}
+
+.gallery-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.media-card {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.media-card img, 
+.media-card video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* Don't mirror recorded videos/photos */
+.media-card img,
+.media-card video {
+    transform: none;
+}
+
+.media-card-actions {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--border-color);
+}
+
+.media-timestamp {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.download-link {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.download-link:hover {
+    background-color: var(--primary-hover);
+}

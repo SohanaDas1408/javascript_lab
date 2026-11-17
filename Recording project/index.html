@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Capture & Record</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Webcam Capture & Record</h1>
+            <p>Take photos and record videos directly from your browser.</p>
+        </header>
+
+        <main>
+            <div class="video-container">
+                <video id="live-video" autoplay playsinline muted></video>
+            </div>
+
+            <div class="controls">
+                <button id="btn-photo" class="btn primary">Take Photo</button>
+                <button id="btn-record-start" class="btn success">Start Recording</button>
+                <button id="btn-record-stop" class="btn danger" disabled>Stop Recording</button>
+            </div>
+
+            <div class="status-indicator">
+                <span id="recording-status" class="hidden">🔴 Recording...</span>
+            </div>
+            
+            <hr>
+
+            <section class="gallery-section">
+                <h2>Captured Media</h2>
+                <div id="gallery" class="gallery">
+                    <!-- Captured photos and videos will appear here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Hidden canvas for capturing photo frames -->
+    <canvas id="snapshot-canvas" style="display: none;"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Step Image Processing Pipeline</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        h1 { text-align: center; color: #2c3e50; }
+        .upload-section { text-align: center; margin-bottom: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input[type="file"] { margin-bottom: 10px; }
+        button { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 16px; }
+        button:hover { background: #2980b9; }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .card img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 4px;
+            object-fit: contain;
+            background: #eee;
+        }
+        
+        .card h3 {
+            margin: 10px 0 5px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .card p {
+            font-size: 0.9em;
+            color: #666;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .loading { display: none; text-align: center; font-size: 1.2em; color: #3498db; margin: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>The 8-Step Image Processing Pipeline</h1>
+    
+    <div class="upload-section">
+        <p>Upload an image to see how a computer acquires, processes, and classifies it step-by-step!</p>
+        <input type="file" id="imageInput" accept="image/*">
+        <br>
+        <button onclick="processImage()">Process Pipeline</button>
+        <div id="loading" class="loading">Processing pipeline... (Running all 8 algorithms)</div>
+    </div>
+    
+    <div class="grid-container" id="resultsGrid">
+        <!-- Results will be injected here -->
+    </div>
+
+    <script>
+        async function processImage() {
+            const fileInput = document.getElementById('imageInput');
+            if (!fileInput.files.length) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            const grid = document.getElementById('resultsGrid');
+            
+            loading.style.display = 'block';
+            grid.innerHTML = ''; // clear old results
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Server processing failed');
+                
+                const data = await response.json();
+                
+                // Add the 9 steps (Original + 8 steps)
+                const items = [
+                    { title: "Original Upload", img: data.original, desc: "The raw image uploaded by the user." },
+                    data.steps.step1,
+                    data.steps.step2,
+                    data.steps.step3,
+                    data.steps.step4,
+                    data.steps.step5,
+                    data.steps.step6,
+                    data.steps.step7,
+                    data.steps.step8,
+                ];
+                
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${item.img}?t=${Date.now()}" alt="${item.title}">
+                        <h3>${item.title}</h3>
+                        <p>${item.desc}</p>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

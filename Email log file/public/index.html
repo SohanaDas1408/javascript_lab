@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session Logger</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ═══════════════════ LOGIN / REGISTER ═══════════════════ -->
+  <div id="auth-section" class="card">
+    <h1>📧 Session Logger</h1>
+    <p class="subtitle">Login with your Gmail account</p>
+
+    <div id="smtp-warning" class="banner warning hidden">
+      <strong>⚠ Email not configured:</strong>
+      <span id="smtp-warning-text"></span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="login">Login</button>
+      <button class="tab" data-tab="register">Register</button>
+    </div>
+
+    <form id="login-form" class="form visible">
+      <div class="input-group">
+        <label for="login-email">Gmail ID</label>
+        <input type="email" id="login-email" placeholder="you@gmail.com" required />
+      </div>
+      <div class="input-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn primary">Login</button>
+    </form>
+
+    <form id="register-form" class="form">
+      <div class="input-group">
+        <label for="reg-email">Gmail ID</label>
+        <input type="email" id="reg-email" placeholder="you@gmail.com" required />
+      </div>
+      <div class="input-group">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" placeholder="Min 6 characters" required />
+      </div>
+      <div class="input-group">
+        <label for="reg-confirm">Confirm Password</label>
+        <input type="password" id="reg-confirm" placeholder="Re-enter password" required />
+      </div>
+      <button type="submit" class="btn primary">Register</button>
+    </form>
+
+    <p id="auth-message" class="message"></p>
+  </div>
+
+  <!-- ═══════════════════ DASHBOARD ═══════════════════════ -->
+  <div id="dashboard-section" class="card wide hidden">
+    <h1>📋 Dashboard</h1>
+
+    <div id="dash-smtp-warning" class="banner warning hidden">
+      <strong>⚠ Email will fail:</strong>
+      <span id="dash-smtp-warning-text"></span>
+    </div>
+
+    <div class="info-bar">
+      <div class="info-item">
+        <span class="label">User</span>
+        <span id="dash-email" class="value"></span>
+      </div>
+      <div class="info-item">
+        <span class="label">Login Time</span>
+        <span id="dash-login-time" class="value"></span>
+      </div>
+    </div>
+
+    <hr />
+
+    <h2>🖥️ PC Activity <span class="badge pulse">Tracking</span></h2>
+    <p class="hint">Automatically monitoring your active applications and websites.</p>
+
+    <div id="activity-table-wrap" class="table-wrap">
+      <table id="activity-table">
+        <thead>
+          <tr>
+            <th>Application</th>
+            <th>Detail</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody id="activity-body">
+          <tr class="empty-row"><td colspan="5">Monitoring started… activities will appear here.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr />
+
+    <button id="logout-btn" class="btn danger">🔓 Logout &amp; Email Log</button>
+    <p id="dash-message" class="message"></p>
+
+    <div id="logout-summary" class="summary hidden">
+      <h3>Session Summary</h3>
+      <p><strong>Logout Time:</strong> <span id="sum-logout-time"></span></p>
+      <p><strong>Activities tracked:</strong> <span id="sum-activities-count"></span></p>
+      <p id="sum-email-status"></p>
+      <p id="sum-email-error" class="error-detail hidden"></p>
+      <button id="back-to-login" class="btn primary" style="margin-top:1rem">Back to Login</button>
+    </div>
+  </div>
+
+  <script>
+    const authSection      = document.getElementById("auth-section");
+    const dashSection      = document.getElementById("dashboard-section");
+    const loginForm        = document.getElementById("login-form");
+    const registerForm     = document.getElementById("register-form");
+    const authMsg          = document.getElementById("auth-message");
+    const dashEmail        = document.getElementById("dash-email");
+    const dashLoginTime    = document.getElementById("dash-login-time");
+    const dashMsg          = document.getElementById("dash-message");
+    const activityBody     = document.getElementById("activity-body");
+    const logoutBtn        = document.getElementById("logout-btn");
+    const logoutSummary    = document.getElementById("logout-summary");
+    const sumLogoutTime    = document.getElementById("sum-logout-time");
+    const sumActivities    = document.getElementById("sum-activities-count");
+    const sumEmailStatus   = document.getElementById("sum-email-status");
+    const sumEmailError    = document.getElementById("sum-email-error");
+    const backToLoginBtn   = document.getElementById("back-to-login");
+    const smtpWarning      = document.getElementById("smtp-warning");
+    const smtpWarningText  = document.getElementById("smtp-warning-text");
+    const dashSmtpWarning  = document.getElementById("dash-smtp-warning");
+    const dashSmtpWarnText = document.getElementById("dash-smtp-warning-text");
+
+    // ── Tabs ─────────────────────────────────────────────
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        const target = tab.dataset.tab;
+        loginForm.classList.toggle("visible", target === "login");
+        registerForm.classList.toggle("visible", target === "register");
+        authMsg.textContent = "";
+      });
+    });
+
+    // ── Helpers ──────────────────────────────────────────
+    function showMsg(el, text, type = "error") {
+      el.textContent = text;
+      el.className = `message ${type}`;
+    }
+
+    async function api(url, opts = {}) {
+      const res = await fetch(url, {
+        headers: { "Content-Type": "application/json" },
+        ...opts,
+      });
+      return { ok: res.ok, data: await res.json() };
+    }
+
+    function showSmtpWarning(errorText) {
+      if (errorText) {
+        smtpWarning.classList.remove("hidden");
+        smtpWarningText.textContent = errorText;
+        dashSmtpWarning.classList.remove("hidden");
+        dashSmtpWarnText.textContent = errorText;
+      } else {
+        smtpWarning.classList.add("hidden");
+        dashSmtpWarning.classList.add("hidden");
+      }
+    }
+
+    function truncate(str, len) {
+      if (!str) return "–";
+      return str.length > len ? str.slice(0, len) + "…" : str;
+    }
+
+    // ── Render activity table ────────────────────────────
+    function renderActivities(activities) {
+      if (!activities.length) {
+        activityBody.innerHTML =
+          '<tr class="empty-row"><td colspan="5">Monitoring started… activities will appear here.</td></tr>';
+        return;
+      }
+
+      activityBody.innerHTML = activities
+        .map((a) => `
+          <tr class="${a.inProgress ? 'active-row' : ''}">
+            <td><strong>${a.app}</strong></td>
+            <td>${truncate(a.detail, 45)}</td>
+            <td>${a.from}</td>
+            <td>${a.inProgress ? '<span class="now-badge">NOW</span>' : a.to}</td>
+            <td>${a.duration}</td>
+          </tr>
+        `)
+        .reverse()  // most recent first
+        .join("");
+    }
+
+    // ── Refresh activities ───────────────────────────────
+    async function refreshActivities() {
+      const { ok, data } = await api("/api/activities");
+      if (ok) renderActivities(data.activities);
+    }
+
+    let refreshInterval;
+
+    // ── SMTP status on load ──────────────────────────────
+    (async () => {
+      try {
+        const { data } = await api("/api/smtp-status");
+        if (!data.ready) showSmtpWarning(data.error);
+      } catch (_) {}
+    })();
+
+    // ── Register ─────────────────────────────────────────
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email    = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-password").value;
+      const confirm  = document.getElementById("reg-confirm").value;
+      if (password !== confirm) return showMsg(authMsg, "Passwords do not match.");
+
+      const { ok, data } = await api("/api/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      showMsg(authMsg, data.message || data.error, ok ? "success" : "error");
+      if (ok) registerForm.reset();
+    });
+
+    // ── Login ────────────────────────────────────────────
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email    = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      const { ok, data } = await api("/api/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      if (!ok) return showMsg(authMsg, data.error);
+
+      if (!data.smtpReady) showSmtpWarning(data.smtpError);
+      else showSmtpWarning(null);
+
+      authSection.classList.add("hidden");
+      dashSection.classList.remove("hidden");
+      dashEmail.textContent     = email;
+      dashLoginTime.textContent = data.loginTime;
+      loginForm.reset();
+      authMsg.textContent = "";
+
+      refreshActivities();
+      refreshInterval = setInterval(refreshActivities, 4000); // refresh every 4s
+    });
+
+    // ── Logout ───────────────────────────────────────────
+    logoutBtn.addEventListener("click", async () => {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = "⏳ Stopping tracker & sending email…";
+
+      const { ok, data } = await api("/api/logout", { method: "POST" });
+      clearInterval(refreshInterval);
+
+      if (ok) {
+        logoutBtn.classList.add("hidden");
+        logoutSummary.classList.remove("hidden");
+        sumLogoutTime.textContent = data.logoutTime;
+        sumActivities.textContent = data.activitiesCount;
+
+        if (data.emailSent) {
+          sumEmailStatus.textContent = "✅ Session log with all activities has been emailed to you.";
+          sumEmailStatus.className = "success";
+          sumEmailError.classList.add("hidden");
+        } else {
+          sumEmailStatus.textContent = "❌ Email could not be sent.";
+          sumEmailStatus.className = "error";
+          sumEmailError.textContent = data.emailError || "Unknown error.";
+          sumEmailError.classList.remove("hidden");
+        }
+      } else {
+        showMsg(dashMsg, data.error || "Logout failed.", "error");
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = "🔓 Logout & Email Log";
+      }
+    });
+
+    // ── Back to login ────────────────────────────────────
+    backToLoginBtn.addEventListener("click", () => {
+      dashSection.classList.add("hidden");
+      authSection.classList.remove("hidden");
+      logoutSummary.classList.add("hidden");
+      logoutBtn.classList.remove("hidden");
+      logoutBtn.disabled = false;
+      logoutBtn.textContent = "🔓 Logout & Email Log";
+      activityBody.innerHTML =
+        '<tr class="empty-row"><td colspan="5">Monitoring started… activities will appear here.</td></tr>';
+      dashMsg.textContent = "";
+      sumEmailError.classList.add("hidden");
+    });
+
+    // ── On load: check if already logged in ──────────────
+    (async () => {
+      const { ok, data } = await api("/api/status");
+      if (ok) {
+        authSection.classList.add("hidden");
+        dashSection.classList.remove("hidden");
+        dashEmail.textContent     = data.email;
+        dashLoginTime.textContent = data.loginTime;
+        if (!data.smtpReady) showSmtpWarning(data.smtpError);
+        refreshActivities();
+        refreshInterval = setInterval(refreshActivities, 4000);
+      }
+    })();
+  </script>
+</body>
+</html>

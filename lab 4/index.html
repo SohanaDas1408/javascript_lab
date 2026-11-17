@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Palindrome Checker</title>
+
+<style>
+
+body{
+
+font-family:Arial,Helvetica,sans-serif;
+background:#eef2f7;
+display:flex;
+justify-content:center;
+padding:40px;
+
+}
+
+.container{
+
+background:white;
+padding:30px;
+width:450px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.2);
+
+}
+
+input{
+
+width:100%;
+padding:10px;
+margin:10px 0;
+font-size:16px;
+
+}
+
+button{
+
+width:100%;
+padding:12px;
+background:#007bff;
+color:white;
+border:none;
+font-size:16px;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#0056b3;
+
+}
+
+#result{
+
+margin-top:20px;
+background:#f8f9fa;
+padding:15px;
+border-radius:8px;
+
+}
+
+</style>
+
+<script src="palindrome.js" defer></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Palindrome Checker</h2>
+
+<p>
+
+<strong>Student:</strong>
+Pramit Kumar Ghosh
+
+<br>
+
+<strong>PRN:</strong>
+24070521109
+
+</p>
+
+<label>
+
+Enter Text
+
+</label>
+
+<input
+type="text"
+id="text"
+placeholder="Enter a word or sentence">
+
+<button onclick="checkPalindrome()">
+
+Check Palindrome
+
+</button>
+
+<div id="result">
+
+Enter text and click the button.
+
+</div>
+
+</div>
+
+</body>
+
+</html>

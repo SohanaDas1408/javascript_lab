@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>DOM To-Do List</title>
+
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #eef2f7;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .container {
+        width: 600px;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+      }
+
+      h2 {
+        text-align: center;
+      }
+
+      .student-info {
+        margin-bottom: 25px;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 6px;
+      }
+
+      .input-section {
+        display: flex;
+        gap: 10px;
+      }
+
+      #taskInput {
+        flex: 1;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      .add-button {
+        padding: 12px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .add-button:hover {
+        background: #0056b3;
+      }
+
+      #taskList {
+        list-style: none;
+        padding: 0;
+        margin-top: 25px;
+      }
+
+      #taskList li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+      }
+
+      #taskList span {
+        flex: 1;
+      }
+
+      #taskList button {
+        padding: 7px 12px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+      }
+
+      #taskList button:first-of-type {
+        background: #ffc107;
+        color: black;
+      }
+
+      #taskList button:last-of-type {
+        background: #dc3545;
+      }
+
+      .inspect-button {
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        background: #343a40;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+
+    <script src="todo.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>To-Do List Application</h2>
+
+      <div class="student-info">
+        <strong>Student:</strong>
+        Pramit Kumar Ghosh
+
+        <br />
+
+        <strong>PRN:</strong>
+        24070521109
+      </div>
+
+      <div class="input-section">
+        <input type="text" id="taskInput" placeholder="Enter a new task" />
+
+        <button class="add-button" onclick="addTask()">Add Task</button>
+      </div>
+
+      <ul id="taskList"></ul>
+
+      <button class="inspect-button" onclick="inspectDOM()">
+        Inspect DOM in Console
+      </button>
+    </div>
+  </body>
+</html>

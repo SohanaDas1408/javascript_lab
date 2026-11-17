@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoPulse Live - Real-Time Market & Portfolio Terminal</title>
+  <meta name="description" content="Interactive real-time web application built with JavaScript and jQuery featuring DOM manipulation, custom events, localStorage, and AJAX integration.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body class="dark-theme">
+
+  <!-- =========================================================================
+       Top Scrolling Real-Time Marquee Ticker
+       ========================================================================= -->
+  <div class="marquee-bar">
+    <div id="marqueeTrack" class="marquee-track">
+      <!-- Dynamically populated via UIManager.renderMarquee() -->
+      <div class="ticker-item"><span class="ticker-symbol font-bold">CONNECTING...</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Main Header & Real-Time Controls
+       ========================================================================= -->
+  <header class="header-wrapper">
+    <div class="main-header">
+      <div class="brand-section">
+        <div class="logo-badge">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-title">CryptoPulse</span>
+        </div>
+        <div class="live-pill" title="Real-time live streaming active">
+          <span class="pulse-dot"></span>
+          <span>LIVE FEED</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Quick Cash Balance Display -->
+        <div class="quick-balance-card" title="Paper Trading Cash Balance">
+          <span class="text-muted">Cash:</span>
+          <span id="headerCashBalance" class="font-bold text-success">$100,000.00</span>
+        </div>
+
+        <!-- Real-Time Countdown & Polling Controller -->
+        <div class="sync-status-box" title="Auto-Refresh Polling Interval">
+          <div class="countdown-track">
+            <div id="countdownBar" class="countdown-progress"></div>
+          </div>
+          <span id="countdownText" class="text-xs font-bold">8s</span>
+          <button id="btnToggleAutoRefresh" class="ctrl-btn" title="Pause / Resume Live Updates">
+            ⏸ <span class="control-label">Pause</span>
+          </button>
+          <button id="btnManualRefresh" class="ctrl-btn" title="Manual Immediate AJAX Refresh (Shortcut: R)">
+            <span class="refresh-icon">↻</span>
+          </button>
+        </div>
+
+        <!-- Refresh Interval Selector -->
+        <select id="refreshIntervalSelect" class="ctrl-btn" title="Select Refresh Rate">
+          <option value="3">3s</option>
+          <option value="5">5s</option>
+          <option value="8" selected>8s</option>
+          <option value="15">15s</option>
+          <option value="30">30s</option>
+        </select>
+
+        <!-- Sound Toggle -->
+        <button id="btnSoundToggle" class="ctrl-btn" title="Toggle Synthesized Audio Feedback">
+          🔊 <span class="nav-text">Sound On</span>
+        </button>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button id="btnThemeToggle" class="ctrl-btn" title="Toggle Dark/Light Mode (Shortcut: T)">
+          ☀️ <span class="nav-text">Light Mode</span>
+        </button>
+
+        <!-- Keyboard Shortcuts Help -->
+        <button id="btnShortcutsHelp" class="ctrl-btn" title="Keyboard Shortcuts (Shortcut: ?)">
+          ⌨️ <span class="nav-text">Shortcuts</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Global Market Metrics Strip -->
+    <div class="metrics-strip">
+      <div class="metrics-container">
+        <div class="metric-item">
+          <span class="metric-label">Total Market Cap</span>
+          <span id="metricTotalMarketCap" class="metric-val">$0.00</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">24h Global Volume</span>
+          <span id="metric24hVolume" class="metric-val">$0.00</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">BTC Dominance</span>
+          <span id="metricBtcDominance" class="metric-val">--%</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Top 24h Gainer</span>
+          <span id="metricTopGainer" class="metric-val">--</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Feed Engine</span>
+          <span id="dataSourceLabel" class="metric-val text-xs text-muted">Connecting...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-bar">
+      <div class="nav-container">
+        <button class="nav-tab active" data-tab="markets">📊 Markets</button>
+        <button class="nav-tab" data-tab="watchlist">⭐ Watchlist</button>
+        <button class="nav-tab" data-tab="portfolio">💼 Portfolio & Simulator</button>
+        <button class="nav-tab" data-tab="alerts">🔔 Price Alerts</button>
+        <button class="nav-tab" data-tab="stream">⚡ Live Activity Stream</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- =========================================================================
+       Main Content Section (Multi-View Single-Page Architecture)
+       ========================================================================= -->
+  <main class="main-wrapper">
+
+    <!-- VIEW 1: MARKETS EXPLORER -->
+    <section id="view-markets" class="view-section">
+      <div class="market-controls-row">
+        <!-- Live Search with Debounce -->
+        <div class="search-box">
+          <span class="search-icon-prefix">🔍</span>
+          <input type="text" id="marketSearchInput" placeholder="Search crypto by name or symbol... (Press /)" autocomplete="off">
+          <button id="btnClearSearch" class="btn-clear-search" title="Clear search">✕</button>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-chips-row">
+          <button class="filter-chip active" data-category="all">All Coins</button>
+          <button class="filter-chip" data-category="gainers">🚀 Top Gainers</button>
+          <button class="filter-chip" data-category="losers">📉 Top Losers</button>
+          <button class="filter-chip" data-category="volume">🔥 High Volume</button>
+          <button class="filter-chip" data-category="largecap">💎 Large Cap (>$50B)</button>
+        </div>
+
+        <!-- View Switcher (Grid vs Table) -->
+        <div class="view-mode-buttons">
+          <button id="btnViewGrid" class="view-btn active" title="Cards Grid View">⊞ Cards</button>
+          <button id="btnViewTable" class="view-btn" title="Table List View">☰ Table</button>
+        </div>
+      </div>
+
+      <!-- Card Grid Container -->
+      <div id="marketGrid" class="market-grid">
+        <!-- Dynamically rendered via UIManager.renderMarketGrid() -->
+      </div>
+
+      <!-- Table Container -->
+      <div id="marketTableWrapper" class="table-wrapper" style="display:none;">
+        <table id="marketTable" class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;" class="text-center">Fav</th>
+              <th data-sort="rank" style="width: 60px;">Rank <span class="sort-icon">▲</span></th>
+              <th data-sort="name">Asset <span class="sort-icon">↕</span></th>
+              <th data-sort="priceUsd">Price <span class="sort-icon">↕</span></th>
+              <th data-sort="changePercent24Hr">24h Change <span class="sort-icon">↕</span></th>
+              <th>24h Trend (Sparkline)</th>
+              <th data-sort="marketCapUsd">Market Cap <span class="sort-icon">↕</span></th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="marketTableBody">
+            <!-- Dynamically rendered via UIManager.renderMarketTable() -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 2: WATCHLIST -->
+    <section id="view-watchlist" class="view-section" style="display:none;">
+      <div class="section-title">
+        <span>⭐ Your Starred Cryptocurrencies</span>
+        <span class="text-xs text-muted">Persisted in LocalStorage with real-time live updates</span>
+      </div>
+      <div id="watchlistContainer" class="market-grid">
+        <!-- Dynamically rendered via UIManager.renderWatchlist() -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: PORTFOLIO & TRADING SIMULATOR -->
+    <section id="view-portfolio" class="view-section" style="display:none;">
+      <!-- Hero Stat Cards -->
+      <div class="portfolio-hero">
+        <div class="hero-metric-card card">
+          <div class="hero-label">Total Net Worth</div>
+          <div id="portfolioNetWorth" class="hero-value font-bold text-success">$100,000.00</div>
+          <span class="text-xs text-muted">Cash Balance + Market Holdings</span>
+        </div>
+        <div class="hero-metric-card card">
+          <div class="hero-label">Available Cash (USD)</div>
+          <div id="portfolioCashBalance" class="hero-value font-bold">$100,000.00</div>
+          <span class="text-xs text-muted">Ready to deploy paper funds</span>
+        </div>
+        <div class="hero-metric-card card">
+          <div class="hero-label">Crypto Assets Value</div>
+          <div id="portfolioHoldingsValue" class="hero-value font-bold">$0.00</div>
+          <span class="text-xs text-muted">Real-time dynamic valuation</span>
+        </div>
+        <div class="hero-metric-card card">
+          <div class="hero-label">Total Unrealized P&L</div>
+          <div id="portfolioTotalPnl" class="hero-value font-bold">$0.00</div>
+          <span class="text-xs text-muted">Profit/Loss across open positions</span>
+        </div>
+      </div>
+
+      <!-- Donut Chart & Holdings Row -->
+      <div class="portfolio-analytics-row">
+        <!-- Asset Allocation Canvas -->
+        <div class="allocation-card card">
+          <h4 class="font-bold">Asset Allocation</h4>
+          <span class="text-xs text-muted">Portfolio Distribution by Value</span>
+          <div class="chart-box">
+            <canvas id="portfolioDonutCanvas" width="240" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- Holdings Table -->
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Holding</th>
+                <th>Units Held</th>
+                <th>Market Price</th>
+                <th>Avg Buy Price</th>
+                <th>Total Value</th>
+                <th>Unrealized P&L</th>
+                <th class="text-right">Trade</th>
+              </tr>
+            </thead>
+            <tbody id="holdingsTableBody">
+              <!-- Dynamically rendered via UIManager.renderPortfolio() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Transaction Ledger Section -->
+      <div class="section-title">
+        <span>📜 Transaction Ledger History</span>
+        <div class="footer-actions">
+          <button id="btnExportData" class="btn btn-xs btn-outline" title="Download backup of portfolio and watchlist">💾 Export JSON</button>
+          <button id="btnImportData" class="btn btn-xs btn-outline" title="Restore portfolio from JSON backup">📂 Import JSON</button>
+          <button id="btnResetData" class="btn btn-xs btn-danger" title="Reset portfolio to initial demo state">🔄 Reset Defaults</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Asset</th>
+              <th>Units</th>
+              <th>Executed Price</th>
+              <th>Total USD</th>
+              <th>Fee (0.1%)</th>
+              <th class="text-right">Delete</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody">
+            <!-- Dynamically rendered via UIManager.renderTransactions() -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 4: PRICE ALERTS -->
+    <section id="view-alerts" class="view-section" style="display:none;">
+      <div class="section-title">
+        <span>🔔 Configured Price Alerts</span>
+        <span class="text-xs text-muted">Real-time alerts notify you immediately when price thresholds are hit</span>
+      </div>
+      <div id="alertsList" class="alerts-list">
+        <!-- Dynamically rendered via UIManager.renderAlerts() -->
+      </div>
+    </section>
+
+    <!-- VIEW 5: LIVE ACTIVITY STREAM -->
+    <section id="view-stream" class="view-section" style="display:none;">
+      <div class="section-title">
+        <span>⚡ Live Market & Whale Activity Stream</span>
+        <span class="text-xs text-muted">Streaming real-time simulated orderbook transactions across major exchanges</span>
+      </div>
+      <div id="whaleStreamContainer" class="stream-container">
+        <!-- Dynamically prepended via UIManager.addLiveTradeItem() -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       Interactive Modals
+       ========================================================================= -->
+
+  <!-- 1. TRADE (BUY / SELL) MODAL -->
+  <div id="tradeModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tradeModalTitle" class="modal-title">Trade Crypto</h3>
+        <button class="modal-close" title="Close modal">✕</button>
+      </div>
+      <form id="tradeForm">
+        <div class="modal-body">
+          <!-- Buy vs Sell Switcher Tabs -->
+          <div class="trade-tab-group">
+            <button type="button" class="trade-tab-btn active" data-mode="buy">BUY</button>
+            <button type="button" class="trade-tab-btn" data-mode="sell">SELL</button>
+          </div>
+
+          <input type="hidden" id="tradeModeInput" value="buy">
+          <input type="hidden" id="tradeCoinId" value="">
+          <input type="hidden" id="tradeCoinSymbol" value="">
+          <input type="hidden" id="tradeCoinName" value="">
+          <input type="hidden" id="tradeCurrentPrice" value="0">
+
+          <!-- Price & Balance Labels -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>Current Market Price:</span>
+              <span id="tradeDisplayPrice" class="font-bold">$0.00</span>
+            </div>
+            <div class="form-label">
+              <span>Cash Available:</span>
+              <span id="tradeCashAvailable" class="font-medium text-success">$0.00</span>
+            </div>
+            <div class="form-label">
+              <span>Current Holdings:</span>
+              <span id="tradeHoldingsAvailable" class="font-medium">0.00</span>
+            </div>
+          </div>
+
+          <!-- Quantity Amount Input -->
+          <div class="form-group">
+            <label class="form-label" for="tradeAmount">Units / Quantity:</label>
+            <input type="number" id="tradeAmount" class="input-box" step="any" min="0.000001" placeholder="e.g. 0.5" required>
+            <!-- Percentage Quick Selectors -->
+            <div class="quick-pct-row">
+              <button type="button" class="btn-pct" data-pct="25">25%</button>
+              <button type="button" class="btn-pct" data-pct="50">50%</button>
+              <button type="button" class="btn-pct" data-pct="75">75%</button>
+              <button type="button" class="btn-pct" data-pct="100">MAX (100%)</button>
+            </div>
+          </div>
+
+          <!-- Total USD Input -->
+          <div class="form-group">
+            <label class="form-label" for="tradeTotalUsd">Estimated Cost (USD):</label>
+            <input type="number" id="tradeTotalUsd" class="input-box" step="0.01" min="0.01" placeholder="e.g. 1500.00">
+            <div class="form-label text-xs mt-1">
+              <span>Simulated Fee (0.1%):</span>
+              <span id="tradeFeeEstimate">$0.00</span>
+            </div>
+          </div>
+
+          <div id="tradeValidationMsg"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" id="btnSubmitTrade" class="btn btn-primary">Confirm Execution</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. COIN DETAILS & INTERACTIVE CANVAS CHART MODAL -->
+  <div id="detailModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content modal-content-lg">
+      <div class="modal-header">
+        <h3 id="detailModalTitle" class="modal-title">Coin Overview</h3>
+        <button class="modal-close" title="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Interactive Canvas Price Chart with Hover Crosshairs -->
+        <div class="detail-chart-wrapper">
+          <canvas id="detailPriceChart" class="detail-chart-canvas" width="620" height="240"></canvas>
+        </div>
+
+        <div class="detail-grid">
+          <div class="card p-3">
+            <span class="stat-label">Current Price</span>
+            <span id="detailPrice" class="font-bold text-success">$0.00</span>
+          </div>
+          <div class="card p-3">
+            <span class="stat-label">Market Rank</span>
+            <span id="detailRank" class="font-bold">#1</span>
+          </div>
+          <div class="card p-3">
+            <span class="stat-label">24h High</span>
+            <span id="detail24hHigh" class="font-bold">$0.00</span>
+          </div>
+          <div class="card p-3">
+            <span class="stat-label">24h Low</span>
+            <span id="detail24hLow" class="font-bold">$0.00</span>
+          </div>
+          <div class="card p-3">
+            <span class="stat-label">Market Capitalization</span>
+            <span id="detailMarketCap" class="font-bold">$0.00</span>
+          </div>
+          <div class="card p-3">
+            <span class="stat-label">24h Volume</span>
+            <span id="detail24hVolume" class="font-bold">$0.00</span>
+          </div>
+          <div class="card p-3" style="grid-column: span 2;">
+            <span class="stat-label">Circulating Supply</span>
+            <span id="detailSupply" class="font-bold">--</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="detailBtnAlert" class="btn btn-outline btn-alert-open" data-id="">🔔 Set Alert</button>
+        <button id="detailBtnTrade" class="btn btn-primary btn-trade-open" data-id="" data-mode="buy">Trade Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SET PRICE ALERT MODAL -->
+  <div id="alertModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Set Price Alert</h3>
+        <button class="modal-close" title="Close modal">✕</button>
+      </div>
+      <form id="alertForm">
+        <div class="modal-body">
+          <input type="hidden" id="alertCoinId" value="">
+          <input type="hidden" id="alertCoinSymbol" value="">
+          <input type="hidden" id="alertCurrentPrice" value="0">
+
+          <div class="form-group">
+            <div class="form-label">
+              <span>Target Asset:</span>
+              <span id="alertModalCoinName" class="font-bold">--</span>
+            </div>
+            <div class="form-label">
+              <span>Current Market Price:</span>
+              <span id="alertModalCurrentPrice" class="font-bold">$0.00</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="alertCondition">Notify me when price:</label>
+            <select id="alertCondition" class="input-box">
+              <option value="above">Rises Above (≥)</option>
+              <option value="below">Drops Below (≤)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="alertTargetPrice">Target Threshold Price (USD):</label>
+            <input type="number" id="alertTargetPrice" class="input-box" step="any" min="0.0001" required placeholder="e.g. 100000">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Alert</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. KEYBOARD SHORTCUTS CHEAT SHEET MODAL -->
+  <div id="shortcutsModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⌨️ Keyboard Shortcuts</h3>
+        <button class="modal-close" title="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <table class="shortcuts-table">
+          <tbody>
+            <tr>
+              <td><kbd>/</kbd></td>
+              <td>Focus live search bar immediately</td>
+            </tr>
+            <tr>
+              <td><kbd>R</kbd></td>
+              <td>Trigger immediate manual AJAX refresh</td>
+            </tr>
+            <tr>
+              <td><kbd>P</kbd></td>
+              <td>Pause / Resume live polling auto-refresh</td>
+            </tr>
+            <tr>
+              <td><kbd>T</kbd></td>
+              <td>Switch between Dark and Light mode themes</td>
+            </tr>
+            <tr>
+              <td><kbd>?</kbd></td>
+              <td>Open this keyboard shortcuts dialog</td>
+            </tr>
+            <tr>
+              <td><kbd>Esc</kbd></td>
+              <td>Close any open modal popup</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-cancel">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for JSON Backup Import -->
+  <input type="file" id="fileImportInput" accept=".json" style="display:none;">
+
+  <!-- Toast Notification Container Stack -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- =========================================================================
+       Application Footer
+       ========================================================================= -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>
+        <strong>CryptoPulse Terminal</strong> — Real-time Web App with JavaScript & jQuery.
+        <span class="text-xs text-muted ml-2">DOM • Events • Web Storage • AJAX Integration</span>
+      </div>
+      <div class="footer-actions">
+        <span>Lab 12 Production Build</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       Script Dependencies & Architecture
+       ========================================================================= -->
+  <!-- 1. jQuery Library from Official CDN with CDNJS Fallback -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script>
+    if (!window.jQuery) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"><\/script>');
+    }
+  </script>
+  <!-- 2. Standalone offline fallback helper (guarantees zero breakdown offline) -->
+  <script src="js/vendor/jquery-fallback.js"></script>
+
+  <!-- 3. Modular Application Architecture -->
+  <script src="js/sound.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
